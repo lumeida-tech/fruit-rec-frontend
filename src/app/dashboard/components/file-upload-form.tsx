@@ -191,16 +191,20 @@ export function FileUploadForm() {
         }, 1000)
     }
 
-    const renderPreview = (fileData: FileWithProgress) => {
-        if (!fileData.previewUrl) return null
+    const renderPreview = (fileData: FileWithProgress, showPlaceholder: boolean = false) => {
 
-        return (
-            <img
-                src={fileData.previewUrl || "/placeholder.svg"}
-                alt={`Preview of ${fileData.file.name}`}
+        if (showPlaceholder) {
+            return (<img
+                src="/placeholder.svg"
+                alt='Image'
                 className="w-full h-full object-cover"
-            />
-        )
+            />)
+        }
+        return (<img
+            src={fileData.previewUrl || "/placeholder.svg"}
+            alt={`Preview of ${fileData.file.name}`}
+            className="w-full h-full object-cover"
+        />)
     }
 
     return (
@@ -318,7 +322,7 @@ export function FileUploadForm() {
                                     {files.map((fileData) => (
                                         <div key={fileData.id} className="flex items-center gap-4 p-4 rounded-lg bg-muted/30">
                                             <div className="relative h-16 w-16 rounded-lg overflow-hidden bg-muted/30">
-                                                {renderPreview(fileData)}
+                                                {renderPreview(fileData, true)}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-medium truncate">{fileData.file.name}</p>
@@ -387,7 +391,8 @@ export function FileUploadForm() {
                                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                     {files.map((fileData) => (
                                         <div key={fileData.id} className="aspect-square rounded-lg overflow-hidden bg-muted/30">
-                                            {renderPreview(fileData)}
+                                            {renderPreview(fileData, true)}
+
                                         </div>
                                     ))}
                                 </div>
