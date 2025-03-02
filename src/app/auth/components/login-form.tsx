@@ -41,12 +41,12 @@ export function LoginForm({
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
                                         <Label htmlFor="password">Mot de passe</Label>
-                                        <a
-                                            href="#"
+                                        <Link
+                                            href="/auth/forgot-password"
                                             className="ml-auto text-sm underline-offset-4 hover:underline"
                                         >
                                             Mot de passe oublié ?
-                                        </a>
+                                        </Link>
                                     </div>
                                     <Input id="password" type="password" required />
                                 </div>
