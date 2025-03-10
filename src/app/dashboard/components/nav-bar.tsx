@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ChevronRight, Search, Bell, Settings, Home, LucideHome, HomeIcon, LogOut, LogOutIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { cn, fetcher } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
@@ -29,6 +29,12 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { useQuery } from "@tanstack/react-query"
+import { useCustomQuery } from "@/context/querycontext"
+import { _User } from "@/types/user.zod"
+import { isAuthenticatedOrRedirect } from "@/services/session.action"
+import useUser from "@/hooks/use-user"
+import { deleteCookie } from "@/services/cookies.action"
 
 interface BreadcrumbItem {
     label: string
@@ -48,6 +54,7 @@ export function Navbar() {
     const pathname = usePathname()
     const [open, setOpen] = React.useState(false)
     const breadcrumbs = getBreadcrumbs(pathname)
+    const user = useUser()
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -59,6 +66,10 @@ export function Navbar() {
         document.addEventListener("keydown", down)
         return () => document.removeEventListener("keydown", down)
     }, [])
+
+    const getFirstAndLastChar = (user: _User|null): string => {
+        return user?.prenom[0] +""+ user?.nom_famille[0]
+    }
 
     return (
         <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -120,15 +131,15 @@ export function Navbar() {
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" className="relative h-9 w-9 rounded-full mr-5 cursor-pointer">
                                     <Avatar className="h-9 w-9 bg-primary/10 hover:bg-primary/15 transition-colors">
-                                        <AvatarFallback className="bg-transparent text-primary font-medium">LG</AvatarFallback>
+                                        <AvatarFallback className="bg-transparent text-primary font-medium">{getFirstAndLastChar(user)}</AvatarFallback>
                                     </Avatar>
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" align="end" forceMount>
                                 <DropdownMenuLabel className="font-normal">
                                     <div className="flex flex-col space-y-1">
-                                        <p className="text-sm font-medium leading-none">Lucas GNACADJA</p>
-                                        <p className="text-xs leading-none text-muted-foreground">l.gnacadja@example.com</p>
+                                        <p className="text-sm font-medium leading-none">{`${user?.prenom} ${user?.nom_famille}`}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
                                     </div>
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
@@ -144,9 +155,9 @@ export function Navbar() {
                                 </DropdownMenuGroup> */}
                                 {/* <DropdownMenuSeparator /> */}
                                 <DropdownMenuItem asChild className="text-destructive cursor-pointer">
-                                    <Link href={"/auth/login"}> <LogOutIcon className="text-destructive" />
+                                    <Button variant={"outline"} onClick={async () => await deleteCookie("auth_token")}> <LogOutIcon className="text-destructive" />
                                         Déconnexion
-                                    </Link>
+                                    </Button>
                                     {/* <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut> */}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
